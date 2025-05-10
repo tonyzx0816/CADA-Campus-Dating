@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  male
+  female
+  gay
+  lesbian
+  transman
+  transwoman
+}
+
+enum SexualOrientation {
+  heterosexual
+  homosexual
+  bisexual
+  pansexual
+  asexual
+  queer
+}
+
+model User {
+  id            String             @id @default(uuid()) @db.Uuid
+  name          String
+  email         String             @unique
+  phone         String?
+  avatar        String?
+  profile       Profile?
+  swipedUsers   Swipe[]            @relation("Swiper") // users I swiped on
+  swipingUsers  Swipe[]            @relation("Swiped") // users who swiped on me
+  messages      Message[]
+  studySessions UserStudySession[]
+  matches1      Match[]            @relation("firstUser")
+  matches2      Match[]            @relation("secondUser")
+  studyGroups   StudySession[]
+}
+
+model Profile {
+  id                String             @id @default(uuid()) @db.Uuid
+  userId            String             @unique @db.Uuid
+  preferredName     String?
+  gender            Gender?
+  genderPreference  Gender?
+  major             String?
+  hobbies           String[]
+  description       String?
+  dateOfBirth       DateTime?
+  sexualOrientation SexualOrientation?
+  photos            String[]
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Swipe {
+  id         String   @id @default(uuid()) @db.Uuid
+  swiperId   String   @db.Uuid
+  swipedId   String   @db.Uuid
+  dateAt     DateTime @default(now())
+  swipeRight Boolean
+  swiper     User     @relation("Swiper", fields: [swiperId], references: [id], onDelete: Cascade)
+  swiped     User     @relation("Swiped", fields: [swipedId], references: [id], onDelete: Cascade)
+
+  @@unique([swiperId, swipedId], name: "swiperId_swipedId")
+}
+
+model Match {
+  id               String            @id @default(uuid()) @db.Uuid
+  firstUserId      String            @db.Uuid
+  secondUserId     String            @db.Uuid
+  dateCreated      DateTime          @default(now())
+  firstUser        User              @relation("firstUser", fields: [firstUserId], references: [id], onDelete: Cascade)
+  secondUser       User              @relation("secondUser", fields: [secondUserId], references: [id], onDelete: Cascade)
+  messages         Message[]
+  unmatchCountdown UnmatchCountdown?
+
+  @@unique([firstUserId, secondUserId])
+}
+
+model UnmatchCountdown {
+  id        String   @id @default(uuid()) @db.Uuid
+  matchId   String   @db.Uuid
+  expiresAt DateTime
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([matchId])
+}
+
+enum MessageType {
+  Media
+  Text
+  Icon
+}
+
+model Message {
+  id       String      @id @default(uuid()) @db.Uuid
+  content  String
+  userId   String      @db.Uuid
+  dateSent DateTime    @default(now())
+  type     MessageType
+  matchId  String      @db.Uuid
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match    Match       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
+
+model SchoolEvent {
+  id          String   @id @default(uuid()) @db.Uuid
+  description String
+  eventTime   DateTime
+  photoUrl    String?
+}
+
+model StudySession {
+  id          String             @id @default(uuid()) @db.Uuid
+  location    String
+  eventTime   DateTime
+  createdById String?            @db.Uuid
+  createdBy   User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  users       UserStudySession[]
+}
+
+model UserStudySession {
+  userId         String       @db.Uuid
+  studySessionId String       @db.Uuid
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studySession   StudySession @relation(fields: [studySessionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, studySessionId])
+}
