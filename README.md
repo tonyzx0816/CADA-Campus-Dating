@@ -1,8 +1,25 @@
-Got it! Here's the updated README to reflect that you're using Next.js for both the frontend and backend:
+# CADA-Campus-Dating
 
----
+## Overview
 
-# Cada App
+CADA (Campus Dating App) is a full-stack web application designed to help students (SJSU) connect and build meaningful relationships on campus. The platform provides features like profile creation, matching, and real-time chat functionality, all while ensuring a secure and user-friendly experience.
+
+
+## Features
+
+- **User Authentication**: Secure login with Google OAuth using NextAuth.js.
+- **Profile Creation**: Users can create detailed profiles with photos, interests, and preferences.
+- **Matching Algorithm**: Matches users based on shared interests and compatibility.
+- **Real-Time Chat**: Enables users to send and receive messages with their matches.
+- **Responsive Design**: Fully responsive UI built with Tailwind CSS for seamless use across devices.
+
+## Tech Stack
+
+- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: PostgreSQL
+- **Authentication**: NextAuth.js with Google OAuth
+- **Hosting**: Vercel
 
 ## Project Setup
 
@@ -18,7 +35,7 @@ To spin up both the backend and the PostgreSQL database using Docker:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/cada-app.git
+   git clone https://github.com/tonyzx0816/CADA-Campus-Dating.git
    ```
 
 2. Navigate to the project directory:
